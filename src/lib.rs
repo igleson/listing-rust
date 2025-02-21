@@ -1,13 +1,21 @@
+use axum::{routing::get, Router};
+use tower_service::Service;
 use worker::*;
+
+fn router() -> Router {
+    Router::new().route("/", get(root))
+}
 
 #[event(fetch)]
 async fn fetch(
-    _req: HttpRequest,
+    req: HttpRequest,
     _env: Env,
     _ctx: Context,
-) -> Result<HttpResponse> {
+) -> Result<axum::http::Response<axum::body::Body>> {
     console_error_panic_hook::set_once();
-    Ok(http::Response::builder()
-        .status(http::StatusCode::OK)
-        .body(Body::empty())?)
+    Ok(router().call(req).await?)
+}
+
+pub async fn root() -> &'static str {
+    "Hello Axum!"
 }

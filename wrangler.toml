@@ -2,5 +2,9 @@ name = "listing"
 main = "build/worker/shim.mjs"
 compatibility_date = "2025-02-21"
 
+[[rules]]
+globs = [ "**/*.wasm" ]
+type = "CompiledWasm"
+
 [build]
-command = "cargo install -q worker-build && worker-build --release"
+command = "cargo install -q worker-build --version ^0.0.8 && worker-build --release" # required
