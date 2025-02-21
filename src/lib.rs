@@ -1,22 +1,16 @@
 use worker::*;
 
 #[event(fetch)]
-async fn fetch(_req: HttpRequest, _env: Env, _ctx: Context) -> Result<HttpResponse> {
+pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Response> {
     let router = Router::new();
 
     router
-        .get_async("/test/:name", |_r, _c| async {
-            if let Some(name) = ctx.param("name") {
-                return Response::ok(format!("hello {}", name));
+        .get_async("/account/:id", |_req, ctx| async move {
+            if let Some(id) = ctx.param("id") {
+                return Response::ok(id);
             };
-            Response::error("Bad Request", 400)
+            return Response::error("Bad Request", 400);
         })
-        .get_async("another", |_r, _c| async { Response::ok("hello another") })
         .run(req, env)
-        .await;
-
-    console_error_panic_hook::set_once();
-    Ok(http::Response::builder()
-        .status(http::StatusCode::OK)
-        .body(Body::empty())?)
+        .await
 }
